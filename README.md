@@ -150,11 +150,14 @@ The backend separates data organisation from business-rule calculation.
 - Deduplication is performed with a `HashSet`.
 - The sale key format is `customerId|productId|date`, which captures the required deduplication rules.
 
-### Repository Pattern
+### SOLID Principles Applied
 
-- `IOrderRepository` defines the order data dependency and supports Dependency Inversion.
-- `JsonOrderRepository` reads from JSON files in production.
-- `FakeOrderRepository` is used by unit tests so business-rule tests do not need file system access.
+- **S — Single Responsibility:** Each method has one reason to change.
+  Data organisation, business logic, and presentation are fully separated.
+- **D — Dependency Inversion:** `SizzlingHotProductService` depends on
+  `IOrderRepository` (abstraction), not `JsonOrderRepository` (concrete).
+  This allows `FakeOrderRepository` to be injected in tests without
+  touching the service layer.
 
 ### Single Responsibility
 
@@ -180,6 +183,33 @@ The backend returns calculated results in the following shape:
   }
 ]
 ```
+
+## Testing Approach
+
+Unit tests are in `Bunnings.SizzlingHotProducts.Tests` and cover:
+
+### Happy Path
+
+- Top product returned correctly for each day
+- Top product returned correctly for the 3-day range
+
+### Business Rules
+
+- Product counted once per order regardless of quantity
+- Same customer, same product, same day across multiple orders = 1 sale
+- Cancelled orders are excluded from totals
+- Tiebreaker resolves alphabetically by product name
+
+### Edge Cases Outside the Supplied Data
+
+- Empty order dataset → returns "No product sales" gracefully
+- All orders cancelled → returns "No product sales" gracefully
+- Duplicate product entries within a single order → counted as 1 sale
+- Product ID not found in product lookup → falls back to product ID
+- Always returns 4 results (3 daily + 1 range) regardless of data
+
+Tests use `FakeOrderRepository` which implements `IOrderRepository`,
+meaning tests run without file system access and are fully isolated.
 
 ## Business Rules
 
