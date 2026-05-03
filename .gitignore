@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# .NET build artifacts
+bin/
+obj/
+
+# Visual Studio user-specific files
+*.user
+*.suo
+.vs/
+
+# Rider
+.idea/
