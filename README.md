@@ -159,12 +159,6 @@ The backend separates data organisation from business-rule calculation.
   This allows `FakeOrderRepository` to be injected in tests without
   touching the service layer.
 
-### Single Responsibility
-
-- Each method has one clear reason to change.
-- Data organisation is separate from business logic.
-- The frontend is purely presentational and contains zero duplicated business logic.
-
 ### API Contract
 
 The backend returns calculated results in the following shape:
